@@ -3,6 +3,8 @@ import ttkbootstrap as tb
 from datetime import date
 import sqlite3 as sql
 
+
+
 root = tb.Window(themename="superhero")
 root.resizable(width=False, height=False)
 root.title("Control de Gastos")
@@ -62,7 +64,7 @@ def ingresar_gastos():
         auxiliar.configure(text="El importe no puede quedar vacio", bootstyle="inverse-danger")
     else:
         # Escribir a la base de datos
-        cursor.execute("""INSERT INTO gastos ('Importe', 'Descripcion del gasto', 'Dia') VALUES (:importe, :descripcion, :fecha);""",
+        cursor.execute("""INSERT INTO gastos ('importe', 'descripcion', 'dia') VALUES (:importe, :descripcion, :fecha);""",
                         {'importe':importe, 'descripcion':descripcion, 'fecha':fecha})
         
         # Guardar los cambios
@@ -77,8 +79,22 @@ def ingresar_gastos():
 
 def ver_gastos():
     clear_window()
-    root.geometry("500x500")
-    boton_menu.grid(row=5, column=0)
+    # Resize 
+    root.geometry("700x500")
+
+    columns = ("importe", "descripcion", "dia")
+    tree = tb.Treeview(root, bootstyle="success", columns=columns, show="headings", height=20)
+    tree.heading("importe", text="Importe")
+    tree.heading("descripcion", text="Descripcion del gasto")
+    tree.heading("dia", text="Dia del gasto")
+
+    # Data
+    cursor.execute("SELECT importe, descripcion, dia FROM gastos")
+    datos = cursor.fetchall()
+    for i in datos:
+        tree.insert("", "end", values=i)
+    tree.grid(row=0, column=0, columnspan=4, padx=43)
+    boton_menu.grid(row=1, column=0, pady=10)
 
 
 
@@ -112,9 +128,12 @@ my_style_2 = tb.Style()
 my_style_2.configure("primary.TButton", font=("Times New Roman", 10))
 boton_submit_gasto = tb.Button(text="Ingresar", bootstyle="primary", style="primary.TButton", command=lambda:[ingresar_gastos(), temp()], width=10)
 
+
+
+
 # Auxiliares
 auxiliar = tb.Label(text="")
-
+separador = tb.Separator(bootstyle="primary")
 
 # Mainloop
 if __name__ == "__main__":

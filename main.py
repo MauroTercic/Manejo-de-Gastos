@@ -130,7 +130,6 @@ boton_submit_gasto = tb.Button(text="Ingresar", bootstyle="primary", style="prim
 
 
 
-
 # Auxiliares
 auxiliar = tb.Label(text="")
 separador = tb.Separator(bootstyle="primary")

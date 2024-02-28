@@ -33,7 +33,8 @@ def reshape():
 def temp():
     auxiliar.grid(row=3, columnspan=5)
 
-
+def tree():
+    pass
 
 # Páginas principales
 def menu_principal():
@@ -82,21 +83,41 @@ def ver_gastos():
     # Resize 
     root.geometry("700x500")
 
+    # Data
+    cursor.execute("SELECT importe, descripcion, dia FROM gastos")
+    datos = cursor.fetchall()
+    if len(datos) >= 10:
+        x = 10
+    else:
+        x = len(datos)
     columns = ("importe", "descripcion", "dia")
-    tree = tb.Treeview(root, bootstyle="success", columns=columns, show="headings", height=20)
+    tree = tb.Treeview(root, bootstyle="success", columns=columns, show="headings", height=x)
     tree.heading("importe", text="Importe")
     tree.heading("descripcion", text="Descripcion del gasto")
     tree.heading("dia", text="Dia del gasto")
 
+
+    for i in range(len(datos)):
+        dato = datos.pop()
+        tree.insert("", "end", values=dato)
+    
+        
+    tree.grid(row=1, column=0, columnspan=4, padx=43)
+    label_ultimos.grid(row=0, column=1, pady=5)
+    menu.grid(row=0, column=2, pady=5)
+    boton_menu.grid(row=2, column=0, pady=10)
+
+def gastos_meses(x):
+    menu.config(text=x)
+    meses = {"Enero":"01", "Febrero":"02", "Marzo":"01", "Abril":"01", "Mayo":"01", "Junio":"01", "Julio":"01", "Agosto":"01",
+              "Septiembre":"01", "Octubre":"01", "Noviembre":"01", "Diciembre":"01"}
+    
     # Data
-    cursor.execute("SELECT importe, descripcion, dia FROM gastos")
+    cursor.execute(f"SELECT strftime('%m', dia) as Mes, importe, descripcion FROM gastos WHERE Mes='{meses[x]}';")
     datos = cursor.fetchall()
-    for i in datos:
-        tree.insert("", "end", values=i)
-    tree.grid(row=0, column=0, columnspan=4, padx=43)
-    boton_menu.grid(row=1, column=0, pady=10)
 
 
+    
 
 
 # Inicializar el menu principal
@@ -128,8 +149,16 @@ my_style_2 = tb.Style()
 my_style_2.configure("primary.TButton", font=("Times New Roman", 10))
 boton_submit_gasto = tb.Button(text="Ingresar", bootstyle="primary", style="primary.TButton", command=lambda:[ingresar_gastos(), temp()], width=10)
 
+# Pagina de ver gastos
+label_ultimos = tb.Label(text="Ultimos gastos", font=("Times New Roman", 20))
+menu = tb.Menubutton(root, bootstyle="primary", text="Meses", width=13)
+inside_menu = tb.Menu(menu)
 
-
+item_var = tk.StringVar()
+meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+for i in meses:
+    inside_menu.add_radiobutton(label=i, variable=item_var, command=lambda i=i: gastos_meses(i))
+menu["menu"] = inside_menu
 # Auxiliares
 auxiliar = tb.Label(text="")
 separador = tb.Separator(bootstyle="primary")

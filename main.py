@@ -108,7 +108,7 @@ def ver_gastos():
     boton_menu.grid(row=2, column=0, pady=50)
 
 
-def gastos_detalles(mes="Enero", año="2024"):
+def gastos_detalles(mes):
     clear_window()
     menu_meses.config(text=mes)
     meses = {"Enero":"01", "Febrero":"02", "Marzo":"03", "Abril":"04", "Mayo":"05", "Junio":"06", "Julio":"07", "Agosto":"08",
@@ -186,11 +186,11 @@ menu_meses["menu"] = inside_menu
 today = date.today()
 años = list(range(2023, today.year+1))
 menu_años = tb.Menubutton(root, bootstyle="primary", text="Año", width=8)
-inside_menu = tb.Menu(menu_años)
-item_var = tk.StringVar()
+inside_menu_años = tb.Menu(menu_años)
+item_var_años = tk.StringVar()
 for i in años:
-    inside_menu.add_radiobutton(label=i, variable=item_var)
-menu_años["menu"] = inside_menu
+    inside_menu_años.add_radiobutton(label=i, variable=item_var_años)
+menu_años["menu"] = inside_menu_años
 
 # Auxiliares
 auxiliar = tb.Label(text="")

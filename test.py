@@ -33,11 +33,12 @@ def t(x,y):
     print(datos)
 
 
-#t("Febrero", '2024')
+t("Febrero", '2024')
 
+cursor.execute("SELECT importe, descripcion, strftime('%d', dia), strftime('%m', dia) as Mes FROM gastos WHERE Mes='02';")
+x = cursor.fetchall()
+total = 0
+for i in x:
+    total += i[0]
 
-today = date.today()
-años = list(range(2023, today.year+1))
-
-for i in años:
-    print(i)
+print(total)

@@ -33,6 +33,18 @@ def reshape():
 def temp():
     auxiliar.grid(row=3, columnspan=5)
 
+def total_gastos(mes):
+    meses = {"Enero":"01", "Febrero":"02", "Marzo":"03", "Abril":"04", "Mayo":"05", "Junio":"06", "Julio":"07", "Agosto":"08",
+              "Septiembre":"09", "Octubre":"10", "Noviembre":"11", "Diciembre":"12"}
+    # Data
+    cursor.execute(f"SELECT importe, descripcion, strftime('%d', dia), strftime('%m', dia) as Mes FROM gastos WHERE Mes='{meses[mes]}';")
+    datos = cursor.fetchall()
+    # Calcular el total de los gastos
+    total = 0
+    for j in datos:
+        total += j[0]
+    total_2.configure(text=total)    
+
 
 # Páginas principales
 def menu_principal():
@@ -113,11 +125,11 @@ def gastos_detalles(mes):
     menu_meses.config(text=mes)
     meses = {"Enero":"01", "Febrero":"02", "Marzo":"03", "Abril":"04", "Mayo":"05", "Junio":"06", "Julio":"07", "Agosto":"08",
               "Septiembre":"09", "Octubre":"10", "Noviembre":"11", "Diciembre":"12"}
-    
+    today = date.today()
+    year = today.year
     # Data
-    cursor.execute(f"SELECT importe, descripcion, strftime('%d', dia), strftime('%m', dia) as Mes FROM gastos WHERE Mes='{meses[mes]}';")
-    #cursor.execute(f"""SELECT importe, descripcion, strftime('%d', dia),
-    #                strftime('%m', dia) as Mes, strftime('%Y', dia) as Año FROM gastos WHERE Mes='{meses[x]}' AND Año='{año}';""")
+    cursor.execute(f"""SELECT importe, descripcion, strftime('%d', dia), strftime('%m', dia) as Mes,
+                    strftime('%Y', dia) as Year FROM gastos WHERE Mes='{meses[mes]}' AND Year='{year}';""")
     datos = cursor.fetchall()
     if len(datos) >= 10:
         size = 10
@@ -134,12 +146,17 @@ def gastos_detalles(mes):
         dato = datos.pop()
         tree.insert("", "end", values=dato)
     
-        
+
+
+
     tree.grid(row=1, column=0, columnspan=4, padx=43)
     label_ultimos.grid(row=0, column=0, pady=5)
     menu_meses.grid(row=0, column=1, pady=5)
     menu_años.grid(row=0, column=2, pady=5)
-    boton_menu.grid(row=2, column=0, pady=10)
+    frame.grid(row=3, column=0)
+    total_1.grid(row=3, column=1)
+    total_2.grid(row=3, column=2)
+    boton_menu.grid(row=4, column=0, pady=10)
 
 
 # Inicializar el menu principal
@@ -179,10 +196,10 @@ inside_menu = tb.Menu(menu_meses)
 item_var = tk.StringVar()
 meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 for x in meses:
-    inside_menu.add_radiobutton(label=x, variable=item_var, command=lambda x=x: gastos_detalles(x))
+    inside_menu.add_radiobutton(label=x, variable=item_var, command=lambda x=x: [gastos_detalles(x), total_gastos(x)])
 menu_meses["menu"] = inside_menu
 
-# Menu para elegir año
+# Menu para elegir año (no funciona la eleccion del año)
 today = date.today()
 años = list(range(2023, today.year+1))
 menu_años = tb.Menubutton(root, bootstyle="primary", text="Año", width=8)
@@ -192,8 +209,14 @@ for i in años:
     inside_menu_años.add_radiobutton(label=i, variable=item_var_años)
 menu_años["menu"] = inside_menu_años
 
+# Total de gasto por mes
+frame = tb.LabelFrame(root, bootstyle="success")
+total_1 = tb.Label(frame, text="Gastos totales:", font=("Times New Roman", 11)) 
+total_2 = tb.Label(frame, text="", bootstyle="")
+
+
 # Auxiliares
-auxiliar = tb.Label(text="")
+auxiliar = tb.Label()
 separador = tb.Separator(bootstyle="primary")
 
 # Mainloop
